@@ -9,4 +9,7 @@
   .delete-button {
     margin-left: 16px;
   }
-  
+ 
+  h3 {
+    color: blue;
+  }

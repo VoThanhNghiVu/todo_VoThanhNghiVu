@@ -15,27 +15,28 @@ export default function UserProvider({children}) {
             await axios.post(url + '/user/register', json, headers);
             setUser({email: '', password: ''});
         } catch (error) {
-            throw error
+            throw error;
         }
-    }
+    };
 
     const signIn = async () => {
         const json = JSON.stringify(user);
         const headers = {headers: {'Content-Type': 'application/json'}};
         try {
             const response = await axios.post(url + '/user/login', json, headers);
-            const token = response.data.token;
+            //const token = response.data.token;
             setUser(response.data);
             sessionStorage.setItem('user', JSON.stringify(response.data));
+            sessionStorage.setItem('token', response.data.token);
         } catch (error) {
             setUser({email: '', password: ''});
-            throw error 
+            throw error; 
         }
-    }
+    };
 
     return (
         <UserContext.Provider value={{user, setUser, signUp, signIn}}>
             {children}
         </UserContext.Provider>
-    )
+    );
 }

@@ -20,4 +20,11 @@ app.use((err,req,res,next) => {
     res.status(statusCode).json({error: err.message})
 })
 
+app.use((err, req, res, next) => {
+    if (err instanceof ApiError) {
+        return res.status(err.statusCode).json({ error: err.message });
+    }
+    res.status(500).json({ error: 'An unexpected error occurred.' });
+});
+
 app.listen(port)

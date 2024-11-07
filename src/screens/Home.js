@@ -1,8 +1,9 @@
 import './Home.css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-//import Row from './components/Row.js';
-//import Authentication from './Authentication.js';
+import Row from '../components/Row.js';
+import useUser from '../context/useUser.js';
+//import Authentication, { AuthenticationMode } from './Authentication.js';
 
 const url = 'http://localhost:3001';
 
@@ -16,38 +17,47 @@ function Home() {
       .then((response) => {
         setTasks(response.data)
       }).catch(error => {
-        alert(error.response?.data?.error || "An error orrcued when fetching!")
+        alert(error.response?.data?.error || "An error occurred when fetching!")
       })
   }, [])
 
   const addTask = () => {
-    const headers = {headers: {Authentication: `Bearer ${user.token}`}};
-    
+    if (!user?.token) {
+      alert('User is not authenticated!');
+      return;
+    }
+
+    const headers = {headers: {Authorization:`Bearer ${user.token}`}};
     axios.post(url + '/create', {description: task}, headers)
     .then(response => {
       setTasks([...tasks, {id: response.data.id, description: task}])
       setTask('')
     }).catch(error => {
-      alert(error.response?.data?.error || "An error orrcued when fetching!")
+      alert(error.response?.data?.error || "An error occurred when fetching!!")
     })  
   }
   
   const deleteTask = (id) => {
-    const headers = {headers: {Authentication: `Bearer ${user.token}`}};
+    if (!user?.token) {
+      alert("User is not authenticated.");
+      return;
+    }
 
+    const headers = { headers: { Authorization: `Bearer ${user.token}` } };
     axios.delete(url + '/delete/' + id, headers)
-      .then(response => {
-        const withoutRemoved = tasks.filter(item => item.id !== id)
-        setTasks(withoutRemoved)
-      }).catch(error => {
-        alert(error.response?.data?.error || "An error orrcued when fetching!")
-      })
-  }
+        .then(() => {
+            const withoutRemoved = tasks.filter(item => item.id !== id);
+            setTasks(withoutRemoved);
+        })
+        .catch(error => {
+            alert(error.response?.data?.error || "An error occurred when fetching!!!");
+        });
+};
   
   return (
     <div id="container">
       <h3>Todos</h3>
-      <form>
+      <form onSubmit={(e) => e.preventDefault()}>
         <input
           placeholder='Add new task'
           value={task}
@@ -60,13 +70,13 @@ function Home() {
           }}
         />
       </form>
-      <ul>
+      <div>
         {tasks.map(item => (
           <Row key={item.id} item={item} deleteTask={deleteTask}/>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
 
-export default App;
+export default Home;

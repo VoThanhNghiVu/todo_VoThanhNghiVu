@@ -31,13 +31,22 @@ router.post('/create',auth,(req, res, next) => {
 
 router.delete('/delete/:id',auth,(req, res, next) => {
     const id = parseInt(req.params.id)
-    pool.query('DELETE FROM task WHERE id = $1',
-        [id],
-        (error, result) => {
-            if (error) return next(error)
-            return res.status(200).json({id: result.rows[0].id})
-        }
-    )
-})
+    console.log(`Attempting to delete task with ID: ${id}`);
+
+    pool.query('DELETE FROM task WHERE id = $1', [id], (error, result) => {
+            if (error) {
+                console.error("Database error: ", error);
+                return next(error);
+            }
+
+            if (result.rowCount === 0) {
+                console.error("Task not found for ID:", id);
+                return res.status(404).json({ message: "Task not found" });
+            }
+    
+            console.log("Task deleted successfully with ID:", id);
+            return res.status(200).json({ message: "Task deleted successfully", id: id });
+    });
+});
 
 export default router;

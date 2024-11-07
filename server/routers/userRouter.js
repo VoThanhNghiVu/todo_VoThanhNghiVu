@@ -2,11 +2,19 @@ import { pool } from "../helpers/db.js";
 import { Router } from "express";
 import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
-const { sign } = jwt;
+import { ApiError } from "../helpers/ApiError.js";
 
+const { sign } = jwt;
 const router = Router();
 
 router.post("/register", async (req, res, next) => {
+    if (!req.body.email || req.body.email.length === 0) {
+        return next(new ApiError("Invalid email for user", 400));
+    }
+    if (!req.body.password || req.body.password.length < 8) {
+        return next(new ApiError("Invalid password < 8 characters", 400));
+    }
+
     hash(req.body.password, 10, (error, hashedPassword) => {
         if (error) next(error);
         try {
@@ -29,24 +37,41 @@ router.post("/login",(req, res, next) => {
         pool.query('SELECT * FROM account WHERE email = $1',
             [req.body.email],
             (error, result) => {
-                if (error) next(error);
-                if (!result || !result.rows) {return next(new Error("Unable to retrieve data from database."))};
-                if (result.rowCount === 0) return next(new Error(invalid_message))
-                    compare(req.body.password, result.rows[0].password, (error, match) => {
-                        if (error) return next(error);
-                        if (!match) return next(new Error(invalid_message));
-                        const token = sign({ user: req.body.email }, process.env.JWT_SECRET_KEY);
-                        const user = result.rows[0];
-                        return res.status(200).json(
-                            { 
-                                'id':user.id,
-                                'email':user.email,
-                                'token':token
-                            }
-                        )
-                    })
+                if (error) {
+                    console.error("Database error 1: ", error);
+                    return next(error)
+                };  
+                if (!result || !result.rows) {
+                    console.error("Database error 2: ", error);
+                    return next(new Error("Unable to retrieve data from database."))
+                };
+                if (result.rowCount === 0) {
+                    console.error("No user found for email:", req.body.email);
+                    return next(new Error("No user found for email:"))
+                };
+                    
+                compare(req.body.password, result.rows[0].password, (error, match) => {
+                    if (error) {
+                        console.error("Error comparing passwords", error);
+                        return next(new Error("Error comparing passwords"))
+                    };
+                    if (!match) {
+                        console.error("Invalid password for email", req.body.email);
+                        return next(new Error("Invalid password for email"))
+                    };
+                        
+                    const token = sign({ user: req.body.email }, process.env.JWT_SECRET_KEY);
+                    const user = result.rows[0];
+                    console.log("User logged in successfully with email:", req.body.email);
+
+                    return res.status(200).json({ 
+                        'id':user.id,
+                        'email':user.email,
+                        'token':token
+                    });
+                });
             }
-        )
+        );
     } catch (error) {
         return next(error);
     }

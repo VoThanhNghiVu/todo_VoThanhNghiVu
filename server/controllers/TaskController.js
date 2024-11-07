@@ -1,5 +1,5 @@
 import { emptyOrRows } from '../helpers/utils.js';
-import { selectAllTasks } from '../models/Task.js';   
+import { selectAllTasks, insertTask } from '../models/Task.js';   
 
 const getTasks = async (req, res, next) => {
     try {

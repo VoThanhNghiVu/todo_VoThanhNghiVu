@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './Authentication.css';
 import React from 'react';
-import { useUser } from '../context/useUser.js';
+import useUser from '../context/useUser.js';
 
 export const AuthenticationMode = Object.freeze({
     Login: 'Login',
@@ -45,7 +45,7 @@ export default function Authentication({ authenticationMode }) {
                 </div>
                 <div>
                     <Link to={authenticationMode === AuthenticationMode.Login ? '/signup' : '/signin'}>
-                        {authenticationMode === AuthenticationMode.Login ? 'No account? Sign up' : 'Already signed up? Sign in'}
+                        {authenticationMode === AuthenticationMode.Login ? 'No account? Please sign up here!' : 'Already signed up? Sign in'}
                     </Link>
                 </div>
             </form>
