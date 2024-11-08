@@ -122,6 +122,9 @@ describe('DELETE Task', () => {
 })
 
 describe('POST register', () => {
+    before(async () => {
+        await pool.query('DELETE FROM account WHERE email = $1', ['register@foo.com']);
+    });
     
     it('should register with valid email and password', async () => {
         const email = 'register@foo.com'

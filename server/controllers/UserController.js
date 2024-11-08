@@ -53,5 +53,4 @@ const postLogin = async(req, res, next) => {
         return next(error);
     }
 };
-
 export { postRegistration, postLogin };

@@ -6,7 +6,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'url';
 
-// Lấy đường dẫn thư mục hiện tại khi dùng ES module
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const initializeTestDb = () => {

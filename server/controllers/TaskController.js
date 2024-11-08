@@ -23,5 +23,4 @@ const postTask = async (req, res, next) => {
         return next(error);
     }
 }
-
 export { getTasks, postTask };

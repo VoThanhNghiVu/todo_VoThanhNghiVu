@@ -12,7 +12,7 @@ router.post("/register", async (req, res, next) => {
         return next(new ApiError("Invalid email for user", 400));
     }
     if (!req.body.password || req.body.password.length < 8) {
-        return next(new ApiError("Invalid password < 8 characters", 400));
+        return next(new ApiError("Invalid password (less than 8 characters)", 400));
     }
 
     hash(req.body.password, 10, (error, hashedPassword) => {
@@ -32,7 +32,7 @@ router.post("/register", async (req, res, next) => {
 })
 
 router.post("/login",(req, res, next) => {
-    const invalid_message = "Invalid credentials. Please try again.";
+    //const invalid_message = "Invalid credentials. Please try again.";
     try {
         pool.query('SELECT * FROM account WHERE email = $1',
             [req.body.email],
